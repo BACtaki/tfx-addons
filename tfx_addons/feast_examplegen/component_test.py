@@ -16,7 +16,9 @@
 Tests for tfx_addons.feast_examplegen.component.
 """
 
-import feast
+import pytest
+
+feast = pytest.importorskip("feast") # noqa
 
 from tfx_addons.feast_examplegen import FeastExampleGen
 
