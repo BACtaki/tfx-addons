@@ -18,9 +18,12 @@ Tests for tfx_addons.feast_examplegen.component.
 
 import pytest
 
-feast = pytest.importorskip("feast") # noqa
+try:
+  import feast
+except ImportError:
+  pytest.skip("feast not available, skipping", allow_module_level=True)
 
-from tfx_addons.feast_examplegen import FeastExampleGen
+from tfx_addons.feast_examplegen.component import FeastExampleGen
 
 
 def test_init():
