@@ -16,12 +16,13 @@
 Tests for tfx_addons.feast_examplegen.component.
 """
 
-import tensorflow as tf
+import feast
+
+from tfx_addons.feast_examplegen import FeastExampleGen
 
 
-class ComponentTest(tf.test.TestCase):
-  pass
-
-
-if __name__ == '__main__':
-  tf.test.main()
+def test_init():
+  repo_config = feast.RepoConfig(provider='local', project='default')
+  FeastExampleGen(repo_config=repo_config,
+                  features=['feature1', 'feature2'],
+                  entity_query='SELECT user FROM fake_db')
