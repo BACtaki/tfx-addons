@@ -29,9 +29,6 @@ jobs:
       matrix:
         depconstraint: ["tfx~=1.4.0 tensorflow~=2.6.0", "tfx~=1.5.0 tensorflow~=2.7.0"]
         extras: ["all, test"]
-        include:
-          - depconstraint: "tfx~=1.4.0 tensorflow~=2.6.0"
-            extras: "all, test, feast_examplegen"
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.7

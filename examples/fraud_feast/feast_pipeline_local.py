@@ -16,6 +16,11 @@
 
 Derived from: https://github.com/feast-dev/feast-fraud-tutorial/blob/4acf205dfbb3615d2f3e913adf1c28c5f2655f4c/notebooks/Fraud_Detection_Tutorial.ipynb
 
+# Set up environment
+$ cd examples/fraud_feast && python -m venv venv && source venv/bin/activate
+$ pip install -r requirements.txt
+$ cd examples/fraud_feast/repo && feast apply
+
 Run pipeline:
 $ python examples/fraud_feast/feast_pipeline_local.py
 """
