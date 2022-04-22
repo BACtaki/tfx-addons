@@ -83,6 +83,9 @@ def _MockReadFromFeast(pipeline, query):
 
 
 def _mock_custom_config():
+  _REPO_CONFIG_KEY = "repo_conf"
+  _FEATURE_KEY = "feature_refs"
+
   offline_store = BigQueryOfflineStoreConfig()
   repo_config = feast.RepoConfig(provider='gcp',
                                  project='default',
@@ -91,8 +94,8 @@ def _mock_custom_config():
   feature_refs = ['feature1', 'feature2']
   config_struct = Struct()
   config_struct.update({
-      executor._REPO_CONFIG_KEY: repo_conf,
-      executor._FEATURE_KEY: feature_refs
+      _REPO_CONFIG_KEY: repo_conf,
+      _FEATURE_KEY: feature_refs
   })
   custom_config_pbs2 = example_gen_pb2.CustomConfig()
   custom_config_pbs2.custom_config.Pack(config_struct)
