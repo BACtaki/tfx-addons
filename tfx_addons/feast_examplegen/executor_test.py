@@ -36,6 +36,7 @@ from tfx.extensions.google_cloud_big_query import utils
 try:
   import feast
   from feast.infra.gcp import GCSRegistryStore
+  # noinspection PyUnresolvedReferences
   from feast.infra.offline_stores.bigquery import (BigQueryOfflineStoreConfig,
                                                    BigQueryRetrievalJob)
   from feast.protos.feast.core.Registry_pb2 import Registry
@@ -114,7 +115,7 @@ def _mock_load_custom_config(custom_config):
 def _mock_get_retrieval_job(entity_query, custom_config):  # pylint: disable=invalid-name, unused-argument
   del entity_query, custom_config  # Unused args
 
-  return FooRetrievalJob("SELECT * FROM `test.test`", "Client",
+  return FooRetrievalJob("SELECT * FROM  `test.test`", "Client",
                          bigquery.QueryJobConfig(dry_run=True), "names")
 
 
