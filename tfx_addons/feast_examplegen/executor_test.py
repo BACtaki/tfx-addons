@@ -18,20 +18,14 @@ Tests for feast_component.executor.
 
 from __future__ import absolute_import, division, print_function
 
-from pathlib import Path
 from typing import Optional
 
-from feast.infra.local import LocalRegistryStore
-from feast.registry_store import RegistryStore
-from feast.repo_config import RegistryConfig
 from google.cloud import bigquery
 from google.protobuf.struct_pb2 import Struct
 
 """Tests for presto_component.executor."""
 
 import datetime
-import os
-import random
 from unittest import mock
 
 import apache_beam as beam
