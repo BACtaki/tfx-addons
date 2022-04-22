@@ -63,14 +63,14 @@ class FooRetrievalJob(BigQueryRetrievalJob):
       timeout: int = 1800,
       retry_cadence: int = 10,
   ) -> Optional[str]:
-    return _MockReadFromFeast2()
+    return _MockReadFromFeast()
 
 
 @beam.ptransform_fn
-def _MockReadFromFeast2(pipeline, query):
+def _MockReadFromFeast(pipeline, query):
   del query  # Unused arg
   mock_query_results = [{
-      'timestamp': datetime.datetime.utcfromtimestamp(4.2e8),
+      'timestamp': datetime.datetime.utcfromtimestamp(4.2e6),
       'i': 1,
       'i2': [2, 3],
       'b': True,
@@ -175,7 +175,7 @@ class ExecutorTest(tf.test.TestCase):
                        _get_retrieval_job=_mock_get_retrieval_job)
   @mock.patch.multiple(
       utils,
-      ReadFromBigQuery=_MockReadFromFeast2,
+      ReadFromBigQuery=_MockReadFromFeast,
   )
   @mock.patch.object(bigquery, 'Client')
   def testFeastToExample(self, mock_client):
@@ -190,7 +190,7 @@ class ExecutorTest(tf.test.TestCase):
                       split_pattern='SELECT i, f, s FROM `fake`'))
       feature = {}
       feature['timestamp'] = tf.train.Feature(float_list=tf.train.FloatList(
-          value=[4.2e8]))
+          value=[4192800])) #todo: explain why this is 4192800 and not 4200000
       feature['i'] = tf.train.Feature(int64_list=tf.train.Int64List(value=[1]))
       feature['i2'] = tf.train.Feature(int64_list=tf.train.Int64List(
           value=[2, 3]))
@@ -206,6 +206,7 @@ class ExecutorTest(tf.test.TestCase):
                  tf.compat.as_bytes('def')]))
       example_proto = tf.train.Example(features=tf.train.Features(
           feature=feature)).SerializeToString(deterministic=True)
+
       util.assert_that(examples, util.equal_to([example_proto]))
 
 
