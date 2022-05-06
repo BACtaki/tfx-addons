@@ -185,7 +185,7 @@ class ExecutorTest(tf.test.TestCase):
               split_pattern='SELECT i, f, s FROM `fake`'))
       feature = {}
       feature['timestamp'] = tf.train.Feature(float_list=tf.train.FloatList(
-          value=[4192800]))  #todo: explain why this is 4192800 and not 4200000
+          value=[4200000]))
       feature['i'] = tf.train.Feature(int64_list=tf.train.Int64List(value=[1]))
       feature['i2'] = tf.train.Feature(int64_list=tf.train.Int64List(
           value=[2, 3]))
