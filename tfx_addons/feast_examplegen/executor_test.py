@@ -18,33 +18,28 @@ Tests for feast_component.executor.
 
 from __future__ import absolute_import, division, print_function
 
-from typing import Optional
-
-from google.cloud import bigquery
-from google.protobuf.struct_pb2 import Struct
-
-"""Tests for presto_component.executor."""
-
 import datetime
+from typing import Optional
 from unittest import mock
 
 import apache_beam as beam
 import pytest
 from apache_beam.testing import util
-from tfx.extensions.google_cloud_big_query import utils
+from google.cloud import bigquery
+from google.protobuf.struct_pb2 import Struct
+
+#some useless comment
 
 try:
   import feast
-  from feast.infra.gcp import GCSRegistryStore
-  # noinspection PyUnresolvedReferences
   from feast.infra.offline_stores.bigquery import (BigQueryOfflineStoreConfig,
                                                    BigQueryRetrievalJob)
-  from feast.protos.feast.core.Registry_pb2 import Registry
 
 except ImportError:
   pytest.skip("feast not available, skipping", allow_module_level=True)
 
 import tensorflow as tf
+from tfx.extensions.google_cloud_big_query import utils
 from tfx.proto import example_gen_pb2
 from tfx.utils import proto_utils
 
@@ -54,15 +49,15 @@ from tfx_addons.feast_examplegen import executor
 class FooRetrievalJob(BigQueryRetrievalJob):
   def to_bigquery(
       self,
-      job_config: bigquery.QueryJobConfig = None,
-      timeout: int = 1800,
-      retry_cadence: int = 10,
-  ) -> Optional[str]:
+      job_config: bigquery.QueryJobConfig = None,  # pylint: disable=unused-argument
+      timeout: int = 1800,  # pylint: disable=unused-argument
+      retry_cadence: int = 10,  # pylint: disable=unused-argument
+  ) -> Optional[str]:  # pylint: disable=invalid-name, unused-argument
     return _MockReadFromFeast()
 
 
 @beam.ptransform_fn
-def _MockReadFromFeast(pipeline, query):
+def _MockReadFromFeast(pipeline, query):  # pylint: disable=invalid-name
   del query  # Unused arg
   mock_query_results = [{
       'timestamp': datetime.datetime.utcfromtimestamp(4.2e6),
@@ -78,8 +73,8 @@ def _MockReadFromFeast(pipeline, query):
 
 
 def _mock_custom_config():
-  _REPO_CONFIG_KEY = "repo_conf"
-  _FEATURE_KEY = "feature_refs"
+  _REPO_CONFIG_KEY = "repo_conf"  # pylint: disable=invalid-name
+  _FEATURE_KEY = "feature_refs"  # pylint: disable=invalid-name
 
   offline_store = BigQueryOfflineStoreConfig()
   repo_config = feast.RepoConfig(provider='gcp',
@@ -98,7 +93,7 @@ def _mock_custom_config():
   return custom_config
 
 
-def _mock_load_custom_config(custom_config):
+def _mock_load_custom_config(custom_config):  # pylint: disable=unused-argument
   offline_store = BigQueryOfflineStoreConfig()
   repo_config = feast.RepoConfig(provider='gcp',
                                  project='default',
@@ -107,13 +102,13 @@ def _mock_load_custom_config(custom_config):
   feature_refs = ['feature1', 'feature2']
 
   return {
-      executor._REPO_CONFIG_KEY: repo_conf,
-      executor._FEATURE_KEY: feature_refs
+      executor._REPO_CONFIG_KEY: repo_conf,  # pylint: disable=protected-access
+      executor._FEATURE_KEY: feature_refs  # pylint: disable=protected-access
   }
 
 
 def _mock_get_retrieval_job(entity_query, custom_config):  # pylint: disable=invalid-name, unused-argument
-  del entity_query, custom_config  # Unused args
+  del entity_query, custom_config  # pylint: disable=unused-argument
 
   return FooRetrievalJob("SELECT * FROM  `test.test`", "Client",
                          bigquery.QueryJobConfig(dry_run=True), "names")
@@ -149,14 +144,14 @@ class ExecutorTest(tf.test.TestCase):
     feature_refs = ['feature1', 'feature2']
     config_struct = Struct()
     config_struct.update({
-        executor._REPO_CONFIG_KEY: repo_conf,
-        executor._FEATURE_KEY: feature_refs
+        executor._REPO_CONFIG_KEY: repo_conf,  # pylint: disable=protected-access
+        executor._FEATURE_KEY: feature_refs  # pylint: disable=protected-access
     })
     custom_config_pbs2 = example_gen_pb2.CustomConfig()
     custom_config_pbs2.custom_config.Pack(config_struct)
     custom_config = proto_utils.proto_to_json(custom_config_pbs2)
-    deseralized_conn = executor._load_custom_config(custom_config)
-    truth_config = _mock_load_custom_config("dummy")
+    deseralized_conn = executor._load_custom_config(custom_config)  # pylint: disable=protected-access
+    truth_config = _mock_load_custom_config(" ")
     self.assertEqual(deseralized_conn, truth_config)
 
   @mock.patch.multiple(
@@ -164,9 +159,9 @@ class ExecutorTest(tf.test.TestCase):
       _load_custom_config=_mock_load_custom_config,
   )
   def testLoadFeastFeatureStore(self):
-    custom_config = executor._load_custom_config("dummy")
-    feature_store = executor._load_feast_feature_store(custom_config)
-    self.assertEqual(feature_store.config.project, 'default')
+    custom_config = executor._load_custom_config(" ")  # pylint: disable=protected-access
+    feature_store = executor._load_feast_feature_store(custom_config)  # pylint: disable=protected-access
+    self.assertEqual(feature_store.config.project, 'default')  # pylint: disable=protected-access
 
   @mock.patch.multiple(executor,
                        _load_custom_config=_mock_load_custom_config,
@@ -177,15 +172,17 @@ class ExecutorTest(tf.test.TestCase):
   )
   @mock.patch.object(bigquery, 'Client')
   def testFeastToExample(self, mock_client):
-    mock_client.return_value.query.return_value.result.return_value.schema = self._schema
+    mock_client.return_value.query.return_value.result.return_value.schema = \
+      self._schema
     with beam.Pipeline() as pipeline:
-      examples = (pipeline
-                  | 'ToTFExample' >> executor._FeastToExampleTransform(
-                      exec_properties={
-                          '_beam_pipeline_args': [],
-                          'custom_config': _mock_custom_config()
-                      },
-                      split_pattern='SELECT i, f, s FROM `fake`'))
+      examples = (
+          pipeline
+          | 'ToTFExample' >> executor._FeastToExampleTransform(  # pylint: disable=protected-access
+              exec_properties={
+                  '_beam_pipeline_args': [],
+                  'custom_config': _mock_custom_config()
+              },
+              split_pattern='SELECT i, f, s FROM `fake`'))
       feature = {}
       feature['timestamp'] = tf.train.Feature(float_list=tf.train.FloatList(
           value=[4192800]))  #todo: explain why this is 4192800 and not 4200000
