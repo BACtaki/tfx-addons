@@ -28,8 +28,6 @@ from apache_beam.testing import util
 from google.cloud import bigquery
 from google.protobuf.struct_pb2 import Struct
 
-#some useless comment
-
 try:
   import feast
   from feast.infra.offline_stores.bigquery import (BigQueryOfflineStoreConfig,
